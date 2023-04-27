@@ -6,7 +6,9 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class Board {
-    char grid[][];
+    public static final int SIZE = 9;
+
+    private char grid[][];
     
     public Board(char[][] grid) {
         this.grid = grid;
@@ -16,10 +18,14 @@ public class Board {
         this.grid = grid;
     }
 
+    public char[][] getGrid() {
+        return grid;
+    }
+
     public static Board fromFile(String filename) throws IOException {
         String basePath = new File("").getAbsolutePath();
         FileReader f = new FileReader(basePath + "/" + filename);
-        char grid[][] = new char[9][9];
+        char grid[][] = new char[SIZE][SIZE];
 
         int character;
         char num;
@@ -31,7 +37,7 @@ public class Board {
             grid[col][row] = num;
             col++;
 
-            if(col%9==0) {
+            if(col%SIZE==0) {
                 col=0;
                 row++;
             } 
