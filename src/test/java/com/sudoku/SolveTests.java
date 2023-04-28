@@ -11,30 +11,37 @@ import static org.junit.Assert.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.nio.file.Path;
 
 public class SolveTests {
+
     @Test
     public void ValidSimplePuzzlesSolveTest() throws Exception {
-        File[] files = getResourceFolderFiles("simple");
+        File[] files = getSudokuFilesFromFolder("simple");
         checkSolveFromFiles(files);
     }
 
     @Test
     public void ValidEasyPuzzlesSolveTest() throws Exception {
-        File[] files = getResourceFolderFiles("easy");
+        File[] files = getSudokuFilesFromFolder("easy");
         checkSolveFromFiles(files);
     }
 
     @Test
     public void ValidIntermediatePuzzlesSolveTest() throws Exception {
-        File[] files = getResourceFolderFiles("intermediate");
+        File[] files = getSudokuFilesFromFolder("intermediate");
         checkSolveFromFiles(files);
     }
 
     @Test
     public void ValidExpertPuzzlesSolveTest() throws Exception {
-        File[] files = getResourceFolderFiles("expert");
+        File[] files = getSudokuFilesFromFolder("expert");
         checkSolveFromFiles(files);
+    }
+    
+    private Puzzle parseFileToPuzzle(File file) throws Exception {
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        return Puzzle.fromString(br.readLine());
     }
 
     private void checkSolveFromFiles(File[] files) throws Exception {
@@ -52,8 +59,16 @@ public class SolveTests {
         }
     }
 
-    private File[] getResourceFolderFiles(String folderPath) {
-        File folder = new File(getClass().getResource("../../../resources/" + folderPath).getPath());
+    private File getSudokuFile(String filePath) {
+        return getResoucePath().resolve(filePath).toFile();
+    }
+
+    private File[] getSudokuFilesFromFolder(String folderPath) {
+        File folder = getResoucePath().resolve(folderPath).toFile();
         return folder.listFiles();
+    }
+
+    private Path getResoucePath() {
+        return Path.of(getClass().getResource("../../../resources/").getPath());
     }
 }
