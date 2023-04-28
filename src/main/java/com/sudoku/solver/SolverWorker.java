@@ -7,16 +7,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 public class SolverWorker implements Runnable {
     private Map<Coord, HashSet<Integer>> possibilitiesMap;
     private Board board;
     private SolvedCallback cb;
+    private ExecutorService executorService;
 
-    public SolverWorker(Board board, SolvedCallback callback) {
+    public SolverWorker(Board board, SolvedCallback callback, ExecutorService executorService) {
         this.possibilitiesMap = new HashMap<>();
         this.board = board;
         this.cb = callback;
+        this.executorService = executorService;
     }
 
     private Coord getLowestPossibilityCoord() {
@@ -128,9 +131,10 @@ public class SolverWorker implements Runnable {
                     return;
                 } else {
                     for (Integer i : possibilitiesMap.get(lowCoord)) {
-                        Board b = board.clone();
-                        b.setNumberAt(lowCoord.x, lowCoord.y, i.toString().charAt(0));
-                        new Thread(new SolverWorker(b, this.cb)).start();
+                        Board boardCopy = board.clone();
+                        boardCopy.setNumberAt(lowCoord.x, lowCoord.y, i.toString().charAt(0));
+                        if(executorService.isShutdown()) { return; }
+                        executorService.submit(new SolverWorker(boardCopy, this.cb, this.executorService));
                     }
                 }
             }
