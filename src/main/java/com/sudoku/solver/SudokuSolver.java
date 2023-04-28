@@ -8,20 +8,19 @@ public class SudokuSolver {
     Board boardToSolve;
     Board solvedBoard;
     
-    public SudokuSolver() {
+    public SudokuSolver(Board boardToSolve, SolvedCallback solvedCallback) {
         try {
             ExecutorService executorService = Executors.newCachedThreadPool();
 
-            this.boardToSolve = Board.fromFile("sample.sudo");
             System.out.println("Puzzle to solve:");
             System.out.println(boardToSolve.toString());
             
             executorService.submit(new SolverWorker(boardToSolve.clone(), board -> {
                 this.solvedBoard = board;
-                System.out.println("Solution:");
-                System.out.println(solvedBoard.toString());
+                solvedCallback.onSolved(board);
                 executorService.shutdown();
             }, executorService));
+
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
