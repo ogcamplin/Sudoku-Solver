@@ -66,6 +66,37 @@ public class Puzzle {
         return new Puzzle(grid);
     }
 
+    public static Puzzle fromString(String puzzleString) {
+        char grid[][] = new char[SIZE][SIZE];
+
+        int row=0; 
+        int col=0;
+
+        for(char num : puzzleString.toCharArray()) {
+            grid[col][row] = num;
+            col++;
+
+            if(col%SIZE==0) {
+                col=0;
+                row++;
+            } 
+        }
+
+        return new Puzzle(grid);
+    }
+
+    public String toResultString() {
+        String result = "";
+
+        for (int row=0; row<grid[0].length; row++) {
+            for (int col=0; col<grid.length; col++) {
+                result += grid[col][row];
+            }
+        }
+
+        return result;
+    }
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("\n");
