@@ -1,11 +1,10 @@
 package com.sudoku.solver;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class Board {
+public class Board implements Cloneable {
     public static final int SIZE = 9;
 
     private char grid[][];
@@ -14,12 +13,27 @@ public class Board {
         this.grid = grid;
     }
 
-    private void setGrid(char[][] grid) {
+    public void setNumberAt(int x, int y, char num) {
+        grid[x][y] = num;
+    }
+
+    public void setGrid(char[][] grid) {
         this.grid = grid;
     }
 
     public char[][] getGrid() {
         return grid;
+    }
+
+    @Override
+    protected Board clone() throws CloneNotSupportedException {
+        char[][] newGrid = new char[SIZE][SIZE];
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                newGrid[i][j] = grid[i][j];
+            }
+        }
+        return new Board(newGrid);
     }
 
     public static Board fromFile(String filename) throws IOException {
@@ -65,7 +79,6 @@ public class Board {
             }
             sb.append("\n");
         }
-        
         return sb.toString();
     }
 }
