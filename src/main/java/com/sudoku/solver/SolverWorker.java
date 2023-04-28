@@ -25,6 +25,10 @@ public class SolverWorker implements Runnable {
         this.executorService = executorService;
     }
 
+    /**
+     * Gets the position within the possibilities map with the lowest number of possibilities
+     * @return Position with the lowest number of possibilities
+     */
     private Position getLowestPossibilityPosition() {
         List<Position> openPositions = new ArrayList<>(possibilitiesMap.keySet());
         Position minPosition = openPositions.remove(0);
@@ -35,6 +39,10 @@ public class SolverWorker implements Runnable {
         return minPosition;
     }
 
+    /**
+     * Fills the possibilities map with the default set of all possibilites (1-9) for each empty position.
+     * @param grid
+     */
     private void fillAllPossibilitiesFromGrid(char[][] grid) {
         for(int row=0; row<Puzzle.SIZE; row++) {
             for(int col=0; col<Puzzle.SIZE; col++) {
@@ -45,6 +53,12 @@ public class SolverWorker implements Runnable {
         }
     }
 
+    /**
+     * Loop through all the positions on the grid that have possibilities. 
+     * - Remove the possibilites associated with the position that are also found within the same square, row, and column.
+     * - If there is only one possibility left, fill that position, and remove the entry from the possibilites map
+     * - If there has been a position that has been filled, loop through all possibilites again.
+     */
     private void computeAndSolvePossibilities() {
         char grid[][] = this.puzzle.getGrid();
         fillAllPossibilitiesFromGrid(grid);
@@ -57,7 +71,7 @@ public class SolverWorker implements Runnable {
             // get all the unfilled cells and compute possible options
             for(Position pos : possibilitiesMap.keySet()) {
                 Set<Integer> possibilitiesSet = possibilitiesMap.get(Position.from(pos.x, pos.y));
-                Position[] bounds = this.getSquareBounds(pos);
+                Position[] bounds = this.getSquareBoundsForPosition(pos);
                 
                 // look at all other numbers in the same square
                 for(int col=bounds[0].x; col<bounds[1].x; col++) {
@@ -87,7 +101,12 @@ public class SolverWorker implements Runnable {
         } while(didFill); 
     }
 
-    private Position[] getSquareBounds(Position pos) {
+    /**
+     * Get the lower and upper x,y coordinates for the square containing the given position.
+     * @param pos
+     * @return [(lower x, lower y), (upper x, upper y)]
+     */
+    private Position[] getSquareBoundsForPosition(Position pos) {
         int xLower = 0;
         int xUpper = 0;
         int yLower = 0;

@@ -35,6 +35,12 @@ public class Puzzle {
         return new Puzzle(newGrid);
     }
 
+    /**
+     * Create a new puzzle from a given file.
+     * @param filename
+     * @return
+     * @throws IOException
+     */
     public static Puzzle fromFile(String filename) throws IOException {
         String basePath = new File("").getAbsolutePath();
         FileReader f = new FileReader(basePath + "/" + filename);
