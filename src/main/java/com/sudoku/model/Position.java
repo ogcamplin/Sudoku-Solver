@@ -1,25 +1,25 @@
-package com.sudoku.solver;
+package com.sudoku.model;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class Coord {
-    private static Map<Integer, Map<Integer, Coord>> cache = new HashMap<>();
+public class Position {
+    private static Map<Integer, Map<Integer, Position>> cache = new HashMap<>();
     public int x;
     public int y;
 
-    public Coord(int x, int y) {
+    public Position(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
-    public static Coord from(int x, int y) {
+    public static Position from(int x, int y) {
         if (!cache.containsKey(x)) {
             cache.put(x, new HashMap<>());
         }
-        Map<Integer, Coord> yCache = cache.get(x);
+        Map<Integer, Position> yCache = cache.get(x);
         if (!yCache.containsKey(y)) {
-            yCache.put(y, new Coord(x, y));
+            yCache.put(y, new Position(x, y));
         }
         return yCache.get(y);
     }
@@ -41,7 +41,7 @@ public class Coord {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Coord other = (Coord) obj;
+        Position other = (Position) obj;
         if (x != other.x)
             return false;
         if (y != other.y)

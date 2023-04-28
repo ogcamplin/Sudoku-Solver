@@ -2,22 +2,22 @@ package com.sudoku.solver;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import com.sudoku.model.Puzzle;
 
 public class SudokuSolver {
-    Board boardToSolve;
-    Board solvedBoard;
+    Puzzle puzzleToSolve;
+    Puzzle solvedPuzzle;
     
-    public SudokuSolver(Board boardToSolve, SolvedCallback solvedCallback) {
+    public SudokuSolver(Puzzle puzzleToSolve, SolvedCallback solvedCallback) {
         try {
             ExecutorService executorService = Executors.newCachedThreadPool();
 
             System.out.println("Puzzle to solve:");
-            System.out.println(boardToSolve.toString());
+            System.out.println(puzzleToSolve.toString());
             
-            executorService.submit(new SolverWorker(boardToSolve.clone(), board -> {
-                this.solvedBoard = board;
-                solvedCallback.onSolved(board);
+            executorService.submit(new SolverWorker(puzzleToSolve.copy(), puzzle -> {
+                this.solvedPuzzle = puzzle;
+                solvedCallback.onSolved(puzzle);
                 executorService.shutdown();
             }, executorService));
 

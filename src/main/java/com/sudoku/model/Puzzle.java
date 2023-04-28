@@ -1,15 +1,15 @@
-package com.sudoku.solver;
+package com.sudoku.model;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class Board implements Cloneable {
+public class Puzzle {
     public static final int SIZE = 9;
 
     private char grid[][];
     
-    public Board(char[][] grid) {
+    public Puzzle(char[][] grid) {
         this.grid = grid;
     }
 
@@ -25,18 +25,17 @@ public class Board implements Cloneable {
         return grid;
     }
 
-    @Override
-    protected Board clone() throws CloneNotSupportedException {
+    public Puzzle copy() {
         char[][] newGrid = new char[SIZE][SIZE];
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 newGrid[i][j] = grid[i][j];
             }
         }
-        return new Board(newGrid);
+        return new Puzzle(newGrid);
     }
 
-    public static Board fromFile(String filename) throws IOException {
+    public static Puzzle fromFile(String filename) throws IOException {
         String basePath = new File("").getAbsolutePath();
         FileReader f = new FileReader(basePath + "/" + filename);
         char grid[][] = new char[SIZE][SIZE];
@@ -58,7 +57,7 @@ public class Board implements Cloneable {
         }
 
         f.close();
-        return new Board(grid);
+        return new Puzzle(grid);
     }
 
     public String toString() {
