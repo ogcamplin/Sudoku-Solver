@@ -1,9 +1,11 @@
 package test.java.com.sudoku;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.sudoku.model.Puzzle;
-import com.sudoku.solver.SolvedCallback;
+import com.sudoku.solver.SolutionException;
+import com.sudoku.solver.SolutionCallback;
 import com.sudoku.solver.SudokuSolver;
 
 import static org.junit.Assert.*;
@@ -11,49 +13,59 @@ import static org.junit.Assert.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Path;
 
 public class SolveTests {
-
     @Test
-    public void ValidSimplePuzzlesSolveTest() throws Exception {
+    public void ValidSimplePuzzlesSolveTest() throws IOException {
         File[] files = getSudokuFilesFromFolder("simple");
         checkSolveFromFiles(files);
     }
 
     @Test
-    public void ValidEasyPuzzlesSolveTest() throws Exception {
+    public void ValidEasyPuzzlesSolveTest() throws IOException {
         File[] files = getSudokuFilesFromFolder("easy");
         checkSolveFromFiles(files);
     }
 
     @Test
-    public void ValidIntermediatePuzzlesSolveTest() throws Exception {
+    public void ValidIntermediatePuzzlesSolveTest() throws IOException {
         File[] files = getSudokuFilesFromFolder("intermediate");
         checkSolveFromFiles(files);
     }
 
     @Test
-    public void ValidExpertPuzzlesSolveTest() throws Exception {
+    public void ValidExpertPuzzlesSolveTest() throws IOException {
         File[] files = getSudokuFilesFromFolder("expert");
         checkSolveFromFiles(files);
     }
     
-    private Puzzle parseFileToPuzzle(File file) throws Exception {
+    @Test
+    public void InvalidPuzzleEmptyTest() throws IOException {
+        Puzzle toSolve = parseFileToPuzzle(getSudokuFile("invalid/empty.sudo"));
+        new SudokuSolver(toSolve,  new FailSolutionCallback("Empty puzzle"));
+    }
+    
+    private Puzzle parseFileToPuzzle(File file) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(file));
         return Puzzle.fromString(br.readLine());
     }
 
-    private void checkSolveFromFiles(File[] files) throws Exception {
+    private void checkSolveFromFiles(File[] files) throws IOException {
         for(File f : files) {
             BufferedReader br = new BufferedReader(new FileReader(f));
             Puzzle toSolve = Puzzle.fromString(br.readLine());
             String solution = br.readLine();
     
-            new SudokuSolver(toSolve, new SolvedCallback() {
+            new SudokuSolver(toSolve, new SolutionCallback() {
                 @Override
-                public void onSolved(Puzzle solvedPuzzle) {
+                public void onSuccess(Puzzle solvedPuzzle) {
                     assertEquals(solution, solvedPuzzle.toResultString());
+                }
+
+                public void onFailure(SolutionException ex) {
+                    Assert.fail(ex.getMessage());
                 }
             });
         }
@@ -70,5 +82,23 @@ public class SolveTests {
 
     private Path getResoucePath() {
         return Path.of(getClass().getResource("../../../resources/").getPath());
+    }
+
+    class FailSolutionCallback implements SolutionCallback {
+        private String expectedMessage;
+
+        public FailSolutionCallback(String expectedMessage) {
+            this.expectedMessage = expectedMessage;
+        }
+
+        @Override
+        public void onSuccess(Puzzle solvedPuzzle) {
+            Assert.fail();
+        }
+
+        @Override
+        public void onFailure(SolutionException ex) {
+            Assert.assertEquals(expectedMessage, ex.getMessage());
+        }
     }
 }

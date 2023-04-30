@@ -15,10 +15,10 @@ import com.sudoku.model.Position;
 public class SolverWorker implements Runnable {
     private Map<Position, HashSet<Integer>> possibilitiesMap;
     private Puzzle puzzle;
-    private SolvedCallback cb;
+    private SolutionCallback cb;
     private ExecutorService executorService;
 
-    public SolverWorker(Puzzle puzzle, SolvedCallback callback, ExecutorService executorService) {
+    public SolverWorker(Puzzle puzzle, SolutionCallback callback, ExecutorService executorService) {
         this.possibilitiesMap = new HashMap<>();
         this.puzzle = puzzle;
         this.cb = callback;
@@ -44,13 +44,18 @@ public class SolverWorker implements Runnable {
      * @param grid
      */
     private void fillAllPossibilitiesFromGrid(char[][] grid) {
+        int emptyCount = 0;
+
         for(int row=0; row<Puzzle.SIZE; row++) {
             for(int col=0; col<Puzzle.SIZE; col++) {
                 if (grid[col][row] == '.') {
                     possibilitiesMap.put(Position.from(col, row), new HashSet<>(Arrays.asList(1,2,3,4,5,6,7,8,9)));
+                    emptyCount += 1;
                 }
             }
         }
+
+        if(emptyCount == 0) { cb.onFailure(new SolutionException("Empty puzzle")); }
     }
 
     /**
@@ -59,7 +64,7 @@ public class SolverWorker implements Runnable {
      * - If there is only one possibility left, fill that position, and remove the entry from the possibilites map
      * - If there has been a position that has been filled, loop through all possibilites again.
      */
-    private void computeAndSolvePossibilities() {
+    private void computeAndSolvePossibilities() throws SolutionException {
         char grid[][] = this.puzzle.getGrid();
         fillAllPossibilitiesFromGrid(grid);
 
@@ -143,7 +148,7 @@ public class SolverWorker implements Runnable {
             computeAndSolvePossibilities();
 
             if(possibilitiesMap.size() == 0) { // no more possibilities to explore, callback
-                this.cb.onSolved(this.puzzle); 
+                this.cb.onSuccess(this.puzzle); 
             } else {
                 Position lowPos = getLowestPossibilityPosition();
 

@@ -3,7 +3,8 @@ package com.sudoku;
 import java.io.IOException;
 
 import com.sudoku.model.Puzzle;
-import com.sudoku.solver.SolvedCallback;
+import com.sudoku.solver.SolutionCallback;
+import com.sudoku.solver.SolutionException;
 import com.sudoku.solver.SudokuSolver;
 
 class Main {
@@ -15,11 +16,20 @@ class Main {
         }
     }
 
-    static class SolvedAction implements SolvedCallback {
+    static class SolvedAction implements SolutionCallback {
         @Override
-        public void onSolved(Puzzle solvedBoard) {
+        public void onSuccess(Puzzle solvedBoard) {
             System.out.println("Solution:");
             System.out.println(solvedBoard.toString());
+        }
+
+        @Override
+        public void onFailure(SolutionException exception) {
+            try {
+                throw exception;
+            } catch(SolutionException ex) {
+                System.out.println(ex.getMessage());
+            }
         }
     }
 }

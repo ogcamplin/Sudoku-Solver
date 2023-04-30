@@ -6,21 +6,15 @@ import com.sudoku.model.Puzzle;
 
 public class SudokuSolver {
     Puzzle puzzleToSolve;
-    Puzzle solvedPuzzle;
     
-    public SudokuSolver(Puzzle puzzleToSolve, SolvedCallback solvedCallback) {
+    public SudokuSolver(Puzzle puzzleToSolve, SolutionCallback solvedCallback) {
         try {
             ExecutorService executorService = Executors.newCachedThreadPool();
 
             System.out.println("Puzzle to solve:");
             System.out.println(puzzleToSolve.toString());
             
-            executorService.submit(new SolverWorker(puzzleToSolve.copy(), puzzle -> {
-                this.solvedPuzzle = puzzle;
-                solvedCallback.onSolved(puzzle);
-                executorService.shutdown();
-            }, executorService));
-
+            executorService.submit(new SolverWorker(puzzleToSolve.copy(), solvedCallback, executorService));
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
