@@ -44,18 +44,19 @@ public class SolverWorker implements Runnable {
      * @param grid
      */
     private void fillAllPossibilitiesFromGrid(char[][] grid) {
-        int emptyCount = 0;
+        int givenCount = 0;
 
         for(int row=0; row<Puzzle.SIZE; row++) {
             for(int col=0; col<Puzzle.SIZE; col++) {
                 if (grid[col][row] == '.') {
                     possibilitiesMap.put(Position.from(col, row), new HashSet<>(Arrays.asList(1,2,3,4,5,6,7,8,9)));
-                    emptyCount += 1;
+                } else {
+                    givenCount += 1;
                 }
             }
         }
 
-        if(emptyCount == 0) { cb.onFailure(new SolutionException("Empty puzzle")); }
+        if(givenCount < 17) { cb.onFailure(new SolutionException("not enough givens / multiple solutions: (" + givenCount + "givens)")); }
     }
 
     /**

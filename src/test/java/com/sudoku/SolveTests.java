@@ -44,7 +44,19 @@ public class SolveTests {
     @Test
     public void InvalidPuzzleEmptyTest() throws IOException {
         Puzzle toSolve = parseFileToPuzzle(getSudokuFile("invalid/empty.sudo"));
-        new SudokuSolver(toSolve,  new FailSolutionCallback("Empty puzzle"));
+        new SudokuSolver(toSolve,  new FailSolutionCallback("not enough givens / multiple solutions: (0 givens)"));
+    }
+
+    @Test
+    public void InvalidPuzzleSingleGivenTest() throws IOException {
+        Puzzle toSolve = parseFileToPuzzle(getSudokuFile("invalid/empty.sudo"));
+        new SudokuSolver(toSolve,  new FailSolutionCallback("not enough givens / multiple solutions: (1 givens)"));
+    }
+
+    @Test
+    public void InvalidPuzzleInsufficentGivenTest() throws IOException {
+        Puzzle toSolve = parseFileToPuzzle(getSudokuFile("invalid/empty.sudo"));
+        new SudokuSolver(toSolve,  new FailSolutionCallback("not enough givens / multiple solutions: (16 givens"));
     }
     
     private Puzzle parseFileToPuzzle(File file) throws IOException {
