@@ -43,7 +43,7 @@ public class SolverWorker implements Runnable {
      * Fills the possibilities map with the default set of all possibilites (1-9) for each empty position.
      * @param grid
      */
-    private void fillAllPossibilitiesFromGrid(char[][] grid) {
+    private boolean fillAllPossibilitiesFromGrid(char[][] grid) {
         int givenCount = 0;
 
         for(int row=0; row<Puzzle.SIZE; row++) {
@@ -56,7 +56,12 @@ public class SolverWorker implements Runnable {
             }
         }
 
-        if(givenCount < 17) { cb.onFailure(new SolutionException("not enough givens / multiple solutions: (" + givenCount + "givens)")); }
+        if(givenCount < 17) { 
+            cb.onFailure(new SolutionException("not enough givens / multiple solutions: (" + givenCount + " givens)"));
+            return false;
+        } else {
+            return true;
+        }
     }
 
     /**
@@ -67,7 +72,9 @@ public class SolverWorker implements Runnable {
      */
     private void computeAndSolvePossibilities() throws SolutionException {
         char grid[][] = this.puzzle.getGrid();
-        fillAllPossibilitiesFromGrid(grid);
+        if(!fillAllPossibilitiesFromGrid(grid)) {
+            return;
+        }
 
         List<Position> filledPositions = new ArrayList<>();
         boolean didFill;
@@ -150,6 +157,7 @@ public class SolverWorker implements Runnable {
 
             if(possibilitiesMap.size() == 0) { // no more possibilities to explore, callback
                 this.cb.onSuccess(this.puzzle); 
+                return;
             } else {
                 Position lowPos = getLowestPossibilityPosition();
 

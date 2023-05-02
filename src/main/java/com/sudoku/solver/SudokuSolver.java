@@ -2,6 +2,8 @@ package com.sudoku.solver;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 import com.sudoku.model.Puzzle;
 
 public class SudokuSolver {
@@ -30,14 +32,15 @@ public class SudokuSolver {
 
         @Override
         public void onSuccess(Puzzle solvedPuzzle) {
-            this.solutionCallback.onSuccess(solvedPuzzle);
+            
             this.executorService.shutdown();
+            this.solutionCallback.onSuccess(solvedPuzzle);
         }
 
         @Override
         public void onFailure(SolutionException exception) {
+            this.executorService.shutdown();
             this.solutionCallback.onFailure(exception);
-            this.executorService.shutdown();;
         }
     }
 }
