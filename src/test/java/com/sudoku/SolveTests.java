@@ -18,25 +18,25 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class SolveTests extends SudokuTestBase {
     @Test
-    public void ValidSimplePuzzlesSolveTest() throws Exception {
+    public void Should_Solve_When_SolveableSimplePuzzles() throws Exception {
         File[] files = getSudokuFilesFromFolder("simple");
         checkSolveFromFiles(files);
     }
 
     @Test
-    public void ValidEasyPuzzlesSolveTest() throws Exception {
+    public void Should_Solve_When_SolveableEasyPuzzles() throws Exception {
         File[] files = getSudokuFilesFromFolder("easy");
         checkSolveFromFiles(files);
     }
 
     @Test
-    public void ValidIntermediatePuzzlesSolveTest() throws Exception {
+    public void Should_Solve_When_SolveableIntermediatePuzzles() throws Exception {
         File[] files = getSudokuFilesFromFolder("intermediate");
         checkSolveFromFiles(files);
     }
 
     @Test
-    public void ValidExpertPuzzlesSolveTest() throws Exception {
+    public void Should_Solve_When_SolveableExpertPuzzles() throws Exception {
         File[] files = getSudokuFilesFromFolder("expert");
         checkSolveFromFiles(files);
     }

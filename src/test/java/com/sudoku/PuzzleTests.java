@@ -9,7 +9,7 @@ import org.junit.Assert;
 
 public class PuzzleTests extends SudokuTestBase {
     @Test
-    public void InvalidPuzzleEmptyTest() throws Exception {
+    public void Should_ThrowException_When_NoneGiven() throws Exception {
         Exception ex = Assert.assertThrows(Exception.class, () -> {
             parseFileToPuzzle(getSudokuFile("invalid/empty.sudo"));
         });
@@ -19,7 +19,7 @@ public class PuzzleTests extends SudokuTestBase {
     }
 
     @Test
-    public void InvalidPuzzleSingleGivenTest() throws Exception {
+    public void Should_ThrowException_When_SingleGiven() throws Exception {
         Exception ex = Assert.assertThrows(Exception.class, () -> {
             parseFileToPuzzle(getSudokuFile("invalid/single-given.sudo"));
         });
@@ -29,7 +29,7 @@ public class PuzzleTests extends SudokuTestBase {
     }
 
     @Test
-    public void InvalidPuzzleInsufficientGivenTest() {
+    public void Should_ThrowException_When_InsufficientGiven() {
         Exception ex = Assert.assertThrows(Exception.class, () -> {
             parseFileToPuzzle(getSudokuFile("invalid/insufficient-given.sudo"));
         });
@@ -39,7 +39,7 @@ public class PuzzleTests extends SudokuTestBase {
     }
 
     @Test
-    public void InvalidPuzzleDuplicateGivenBoxTest() throws Exception {
+    public void Should_ThrowException_When_DuplicateGivenBox() throws Exception {
         Exception ex = Assert.assertThrows(Exception.class, () -> {
             parseFileToPuzzle(getSudokuFile("invalid/duplicate-given-box.sudo"));
         });
@@ -49,7 +49,7 @@ public class PuzzleTests extends SudokuTestBase {
     }
 
     @Test
-    public void InvalidPuzzleDuplicateGivenColumnTest() throws Exception {
+    public void Should_ThrowException_When_DuplicateGivenColumn() throws Exception {
         Exception ex = Assert.assertThrows(Exception.class, () -> {
             parseFileToPuzzle(getSudokuFile("invalid/duplicate-given-column.sudo"));
         });
@@ -60,7 +60,7 @@ public class PuzzleTests extends SudokuTestBase {
     }
 
     @Test
-    public void InvalidPuzzleDuplicateGivenRowTest() throws Exception {
+    public void Should_ThrowException_When_DuplicateGivenRow() throws Exception {
         Exception ex = Assert.assertThrows(Exception.class, () -> {
             parseFileToPuzzle(getSudokuFile("invalid/duplicate-given-row.sudo"));
         });
