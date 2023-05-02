@@ -1,7 +1,5 @@
 package com.sudoku;
 
-import java.io.IOException;
-
 import com.sudoku.model.Puzzle;
 import com.sudoku.solver.SolutionCallback;
 import com.sudoku.solver.SolutionException;
@@ -11,8 +9,8 @@ class Main {
     public static void main(String[] args) {
         try {
             new SudokuSolver(Puzzle.fromFile("sample.sudo"), new SolvedAction());
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 

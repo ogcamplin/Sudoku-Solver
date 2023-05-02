@@ -12,15 +12,11 @@ import static org.junit.Assert.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class SolveTests {
-    /* ---------- Valid ---------- */
-
+public class SolveTests extends SudokuTestBase {
     @Test
     public void ValidSimplePuzzlesSolveTest() throws Exception {
         File[] files = getSudokuFilesFromFolder("simple");
@@ -45,58 +41,9 @@ public class SolveTests {
         checkSolveFromFiles(files);
     }
     
-    /* ---------- Invalid ---------- */
-
-    @Test
-    public void InvalidPuzzleEmptyTest() throws Exception {
-        Puzzle toSolve = parseFileToPuzzle(getSudokuFile("invalid/empty.sudo"));
-        CountDownLatch callbackLatch = new CountDownLatch(1);
-        
-        SolutionCallbackTestWrapper cb = new SolutionCallbackTestWrapper(callbackLatch);
-        new SudokuSolver(toSolve, cb);
-
-        callbackLatch.await();
-        assertTrue(cb.isFailureCalled.get());
-        assertFalse(cb.isSuccessCalled.get());
-        assertEquals("not enough givens / multiple solutions: (0 givens)", cb.exceptionRef.get().getMessage());
-    }
-
-    @Test
-    public void InvalidPuzzleSingleGivenTest() throws Exception {
-        Puzzle toSolve = parseFileToPuzzle(getSudokuFile("invalid/single-given.sudo"));
-        CountDownLatch callbackLatch = new CountDownLatch(1);
-        
-        SolutionCallbackTestWrapper cb = new SolutionCallbackTestWrapper(callbackLatch);
-        new SudokuSolver(toSolve, cb);
-
-        callbackLatch.await();
-        assertTrue(cb.isFailureCalled.get());
-        assertFalse(cb.isSuccessCalled.get());
-        assertEquals("not enough givens / multiple solutions: (1 givens)", cb.exceptionRef.get().getMessage());
-    }
-
-    @Test
-    public void InvalidPuzzleInsufficentGivenTest() throws Exception {
-        Puzzle toSolve = parseFileToPuzzle(getSudokuFile("invalid/insufficient-given.sudo"));
-        CountDownLatch callbackLatch = new CountDownLatch(1);
-        
-        SolutionCallbackTestWrapper cb = new SolutionCallbackTestWrapper(callbackLatch);
-        new SudokuSolver(toSolve, cb);
-
-        callbackLatch.await();
-        assertTrue(cb.isFailureCalled.get());
-        assertFalse(cb.isSuccessCalled.get());
-        assertEquals("not enough givens / multiple solutions: (16 givens)", cb.exceptionRef.get().getMessage());
-    }
-    
     /* ---------- Helpers ---------- */
 
-    private Puzzle parseFileToPuzzle(File file) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(file));
-        return Puzzle.fromString(br.readLine());
-    }
-
-    private void checkSolveFromFiles(File[] files) throws IOException, InterruptedException {
+    private void checkSolveFromFiles(File[] files) throws Exception {
         for(File f : files) {
             BufferedReader br = new BufferedReader(new FileReader(f));
             Puzzle toSolve = Puzzle.fromString(br.readLine());
@@ -108,24 +55,12 @@ public class SolveTests {
             new SudokuSolver(toSolve, cb);
 
             callbackLatch.await();
-
-            assertFalse(cb.isFailureCalled.get());
+            SolutionException ex = cb.exceptionRef.get();
+            assertFalse(ex != null? ex.getMessage() : null, cb.isFailureCalled.get());
             assertTrue(cb.isSuccessCalled.get());
             assertEquals(solution, cb.puzzleRef.get().toResultString());
+            br.close();
         }
-    }
-
-    private File getSudokuFile(String filePath) {
-        return getResoucePath().resolve(filePath).toFile();
-    }
-
-    private File[] getSudokuFilesFromFolder(String folderPath) {
-        File folder = getResoucePath().resolve(folderPath).toFile();
-        return folder.listFiles();
-    }
-
-    private Path getResoucePath() {
-        return Path.of(getClass().getResource("../../resources/").getPath());
     }
 
     class SolutionCallbackTestWrapper implements SolutionCallback {

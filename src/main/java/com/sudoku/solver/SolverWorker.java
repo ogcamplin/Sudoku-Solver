@@ -43,24 +43,13 @@ public class SolverWorker implements Runnable {
      * Fills the possibilities map with the default set of all possibilites (1-9) for each empty position.
      * @param grid
      */
-    private boolean fillAllPossibilitiesFromGrid(char[][] grid) {
-        int givenCount = 0;
-
+    private void fillAllPossibilitiesFromGrid(char[][] grid) {
         for(int row=0; row<Puzzle.SIZE; row++) {
             for(int col=0; col<Puzzle.SIZE; col++) {
                 if (grid[col][row] == '.') {
                     possibilitiesMap.put(Position.from(col, row), new HashSet<>(Arrays.asList(1,2,3,4,5,6,7,8,9)));
-                } else {
-                    givenCount += 1;
                 }
             }
-        }
-
-        if(givenCount < 17) { 
-            cb.onFailure(new SolutionException("not enough givens / multiple solutions: (" + givenCount + " givens)"));
-            return false;
-        } else {
-            return true;
         }
     }
 
@@ -72,9 +61,7 @@ public class SolverWorker implements Runnable {
      */
     private void computeAndSolvePossibilities() throws SolutionException {
         char grid[][] = this.puzzle.getGrid();
-        if(!fillAllPossibilitiesFromGrid(grid)) {
-            return;
-        }
+        fillAllPossibilitiesFromGrid(grid);
 
         List<Position> filledPositions = new ArrayList<>();
         boolean didFill;
