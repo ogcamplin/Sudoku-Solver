@@ -2,7 +2,7 @@ package com.sudoku.solver;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Future;
 
 import com.sudoku.model.Puzzle;
 
@@ -14,8 +14,17 @@ public class SudokuSolver {
             ExecutorService executorService = Executors.newCachedThreadPool();
             System.out.println("Puzzle to solve:");
             System.out.println(puzzleToSolve.toString());
-            
-            executorService.submit(new SolverWorker(puzzleToSolve.copy(), new SolutionCallbackSolverWrapper(executorService, solutionCallback), executorService));
+            SolutionCallbackSolverWrapper cb = new SolutionCallbackSolverWrapper(executorService, solutionCallback);
+
+            Future<Boolean> solvedFuture = executorService.submit(new SolverWorker(puzzleToSolve.copy(), cb, executorService));
+
+            Boolean solvedResult = solvedFuture.get();
+
+            if(!solvedResult) {
+                cb.onFailure(new SolutionException("Unsolvable Puzzle"));
+            } else {
+                executorService.shutdown();
+            }
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
@@ -32,7 +41,6 @@ public class SudokuSolver {
 
         @Override
         public void onSuccess(Puzzle solvedPuzzle) {
-            
             this.executorService.shutdown();
             this.solutionCallback.onSuccess(solvedPuzzle);
         }

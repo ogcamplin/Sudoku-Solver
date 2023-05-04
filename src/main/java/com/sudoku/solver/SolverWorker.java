@@ -7,12 +7,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import com.sudoku.model.Puzzle;
 import com.sudoku.model.Position;
 
-public class SolverWorker implements Runnable {
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+public class SolverWorker implements Callable<Boolean> {
+    private static final Logger logger = LogManager.getLogger(SolverWorker.class);
+
     private Map<Position, HashSet<Integer>> possibilitiesMap;
     private Puzzle puzzle;
     private SolutionCallback cb;
@@ -137,30 +145,42 @@ public class SolverWorker implements Runnable {
         return new Position[]{Position.from(xLower, yLower), Position.from(xUpper, yUpper)};
     }
 
+
+    
     @Override
-    public void run() {
+    public Boolean call() {
+        logger.info("Starting thread");
         try {
+            List<Future<Boolean>> subtaskFutures = new ArrayList<>();
             computeAndSolvePossibilities();
 
             if(possibilitiesMap.size() == 0) { // no more possibilities to explore, callback
-                this.cb.onSuccess(this.puzzle); 
-                return;
+                logger.info("Solution found!");
+                this.cb.onSuccess(this.puzzle);
+                return true;
             } else {
                 Position lowPos = getLowestPossibilityPosition();
 
                 if(possibilitiesMap.get(lowPos).size() == 0) { // no possible options here, quit thread because its no good!
-                    return;
+                    return false;
                 } else {
                     for (Integer i : possibilitiesMap.get(lowPos)) {
                         Puzzle puzzleCopy = puzzle.copy();
                         puzzleCopy.setNumberAt(lowPos.x, lowPos.y, i.toString().charAt(0));
-                        if(executorService.isShutdown()) { return; }
-                        executorService.submit(new SolverWorker(puzzleCopy, this.cb, this.executorService));
+                        if(executorService.isShutdown()) { return false; }
+                        subtaskFutures.add(executorService.submit(new SolverWorker(puzzleCopy, this.cb, this.executorService)));
                     }
                 }
+
+                for (Future<Boolean> subtaskFuture : subtaskFutures) {
+                    Boolean subtaskResult = subtaskFuture.get(1, TimeUnit.SECONDS);
+                    if(subtaskResult) return true;
+                }
+                return false;
             }
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
+            return false;
         }
     }
 }

@@ -56,7 +56,6 @@ public class PuzzleTests extends SudokuTestBase {
         
         assertTrue(ex instanceof InvalidPuzzleException);
         assertEquals("Duplicates found at column 5", ex.getMessage()); 
-        
     }
 
     @Test
@@ -68,7 +67,4 @@ public class PuzzleTests extends SudokuTestBase {
         assertTrue(ex instanceof InvalidPuzzleException);
         assertEquals("Duplicates found at row 5", ex.getMessage()); 
     }
-
-
-
 }

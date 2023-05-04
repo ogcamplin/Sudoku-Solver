@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -39,6 +40,62 @@ public class SolveTests extends SudokuTestBase {
     public void Should_Solve_When_SolveableExpertPuzzles() throws Exception {
         File[] files = getSudokuFilesFromFolder("expert");
         checkSolveFromFiles(files);
+    }
+
+    @Test
+    public void Should_ThrowUnsolvableException_When_UnsolvableBox() throws Exception {
+        Puzzle toSolve = parseFileToPuzzle(getSudokuFile("invalid/unsolvable-box.sudo"));
+        CountDownLatch callbackLatch = new CountDownLatch(1);
+        
+        SolutionCallbackTestWrapper cb = new SolutionCallbackTestWrapper(callbackLatch);
+        new SudokuSolver(toSolve, cb);
+
+        callbackLatch.await(5, TimeUnit.SECONDS);
+        assertTrue(cb.isFailureCalled.get());
+        assertFalse(cb.isSuccessCalled.get());
+        assertEquals("Unsolvable Puzzle", cb.exceptionRef.get().getMessage());
+    }
+
+    @Test
+    public void Should_ThrowUnsolvableException_When_UnsolvableRow() throws Exception {
+        Puzzle toSolve = parseFileToPuzzle(getSudokuFile("invalid/unsolvable-row.sudo"));
+        CountDownLatch callbackLatch = new CountDownLatch(1);
+        
+        SolutionCallbackTestWrapper cb = new SolutionCallbackTestWrapper(callbackLatch);
+        new SudokuSolver(toSolve, cb);
+
+        callbackLatch.await(5, TimeUnit.SECONDS);
+        assertTrue(cb.isFailureCalled.get());
+        assertFalse(cb.isSuccessCalled.get());
+        assertEquals("Unsolvable Puzzle", cb.exceptionRef.get().getMessage());
+    }
+
+    @Test
+    public void Should_ThrowUnsolvableException_When_UnsolvableColumn() throws Exception {
+        Puzzle toSolve = parseFileToPuzzle(getSudokuFile("invalid/unsolvable-column.sudo"));
+        CountDownLatch callbackLatch = new CountDownLatch(1);
+        
+        SolutionCallbackTestWrapper cb = new SolutionCallbackTestWrapper(callbackLatch);
+        new SudokuSolver(toSolve, cb);
+
+        callbackLatch.await(5, TimeUnit.SECONDS);
+        assertTrue(cb.isFailureCalled.get());
+        assertFalse(cb.isSuccessCalled.get());
+        assertEquals("Unsolvable Puzzle", cb.exceptionRef.get().getMessage());
+    }
+
+    @Test
+    public void Should_ThrowUnsolvableException_When_UnsolvableSquare() throws Exception {
+        Puzzle toSolve = parseFileToPuzzle(getSudokuFile("invalid/unsolvable-square.sudo"));
+        CountDownLatch callbackLatch = new CountDownLatch(1);
+        
+        SolutionCallbackTestWrapper cb = new SolutionCallbackTestWrapper(callbackLatch);
+        new SudokuSolver(toSolve, cb);
+
+        callbackLatch.await(5, TimeUnit.SECONDS);
+        assertTrue(cb.isFailureCalled.get());
+        assertFalse(cb.isSuccessCalled.get());
+        assertEquals("Unsolvable Puzzle", cb.exceptionRef.get().getMessage());
     }
     
     /* ---------- Helpers ---------- */
