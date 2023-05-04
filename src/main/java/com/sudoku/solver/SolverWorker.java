@@ -145,8 +145,6 @@ public class SolverWorker implements Callable<Boolean> {
         return new Position[]{Position.from(xLower, yLower), Position.from(xUpper, yUpper)};
     }
 
-
-    
     @Override
     public Boolean call() {
         logger.info("Starting thread");

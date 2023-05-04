@@ -20,11 +20,9 @@ public class SudokuSolver {
 
             Boolean solvedResult = solvedFuture.get();
 
-            if(!solvedResult) {
+            if(!solvedResult && !executorService.isShutdown()) {
                 cb.onFailure(new SolutionException("Unsolvable Puzzle"));
-            } else {
-                executorService.shutdown();
-            }
+            } 
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
