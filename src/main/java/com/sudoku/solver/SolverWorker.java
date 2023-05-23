@@ -99,7 +99,9 @@ public class SolverWorker implements Callable<Boolean> {
                 }
 
                 if(possibilitiesSet.size() == 1) {
-                    grid[pos.x][pos.y] = ((Integer)possibilitiesSet.toArray()[0]).toString().charAt(0);
+                    char selectdNumber = ((Integer)possibilitiesSet.toArray()[0]).toString().charAt(0);
+                    grid[pos.x][pos.y] = selectdNumber;
+                    logger.debug("Filled cell at position (" + pos.x + "," + pos.y + ") with " + selectdNumber);
                     filledPositions.add(pos);
                     didFill = true;
                 };
@@ -147,7 +149,7 @@ public class SolverWorker implements Callable<Boolean> {
 
     @Override
     public Boolean call() {
-        logger.info("Starting thread");
+        logger.debug("Starting thread");
         try {
             List<Future<Boolean>> subtaskFutures = new ArrayList<>();
             computeAndSolvePossibilities();
@@ -160,12 +162,19 @@ public class SolverWorker implements Callable<Boolean> {
                 Position lowPos = getLowestPossibilityPosition();
 
                 if(possibilitiesMap.get(lowPos).size() == 0) { // no possible options here, quit thread because its no good!
+                    logger.info("No solution found");
                     return false;
                 } else {
                     for (Integer i : possibilitiesMap.get(lowPos)) {
                         Puzzle puzzleCopy = puzzle.copy();
                         puzzleCopy.setNumberAt(lowPos.x, lowPos.y, i.toString().charAt(0));
-                        if(executorService.isShutdown()) { return false; }
+
+                        if(executorService.isShutdown()) { 
+                            logger.trace("Stopping forking, thread pool has been closed");
+                            return false; 
+                        }
+                        
+                        logger.debug("Forking puzzle, trying possibility: " + i.toString());
                         subtaskFutures.add(executorService.submit(new SolverWorker(puzzleCopy, this.cb, this.executorService)));
                     }
                 }

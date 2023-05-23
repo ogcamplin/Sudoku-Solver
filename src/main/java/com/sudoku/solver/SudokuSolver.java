@@ -22,7 +22,9 @@ public class SudokuSolver {
 
             if(!solvedResult && !executorService.isShutdown()) {
                 cb.onFailure(new SolutionException("Unsolvable Puzzle"));
-            } 
+            } else {
+                throw new IllegalStateException("Solution was found but callback was not executed");
+            }
         } catch (Exception ex) {
             System.out.println(ex.toString());
         }
